@@ -136,7 +136,7 @@
         if (!team1.value || !team2.value) return alert("Select both teams");
         if (team1.value === team2.value) return alert("Teams must be different");
 
-        const url = `https://embedsports.me/cricket-world-cup/${formatTeam(team1.value)}-vs-${formatTeam(team2.value)}-stream-1`;
+        const url = `https://embedsports.me/cricket-world-cup/super-8-${formatTeam(team1.value)}-vs-${formatTeam(team2.value)}-stream-1`;
         document.getElementById("matchFrame").src = url;
 
         // auto-hide controls after play
