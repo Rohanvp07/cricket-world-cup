@@ -1,224 +1,2674 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Cricket Match Stream</title>
+    <title>MatchDay - Cricket</title>
 
     <style>
-        body, html {
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #07090d;
+            --panel: #10141b;
+            --panel2: #151a23;
+            --border: rgba(255,255,255,0.08);
+            --text: #ffffff;
+            --muted: #8d96a5;
+            --green: #35e58a;
+            --green2: #19c878;
+            --red: #ff4d5a;
+        }
+
+        html,
+        body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            background: #000;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
+            min-height: 100%;
+            background:
+                radial-gradient(
+                    circle at 15% 0%,
+                    rgba(53,229,138,0.10),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 5%,
+                    rgba(50,120,255,0.08),
+                    transparent 30%
+                ),
+                var(--bg);
+            color: var(--text);
+            font-family:
+                "Segoe UI",
+                Inter,
+                Arial,
+                sans-serif;
         }
 
-        iframe {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
+        body {
+            min-height: 100vh;
         }
 
-        .controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
+        /* ==============================
+           HEADER
+        ============================== */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+
+            background:
+                rgba(7,9,13,0.86);
+
+            backdrop-filter: blur(20px);
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1250px;
+            margin: auto;
+            padding: 17px 24px;
+
             display: flex;
-            gap: 10px;
-            padding: 14px;
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
         }
 
-        select, button {
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: none;
-            outline: none;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+
+            border-radius: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--green),
+                    var(--green2)
+                );
+
+            color: #041009;
+
+            font-size: 22px;
+
+            box-shadow:
+                0 8px 25px
+                rgba(53,229,138,0.20);
+        }
+
+        .brand-text h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text span {
+            display: block;
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-button {
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: white;
+
+            border-radius: 11px;
+
+            padding: 10px 13px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .icon-button:hover {
+            background: rgba(255,255,255,0.09);
+            transform: translateY(-1px);
+        }
+
+        /* ==============================
+           MAIN
+        ============================== */
+
+        main {
+            max-width: 1250px;
+            margin: auto;
+
+            padding:
+                28px 24px 60px;
+        }
+
+        /* ==============================
+           HERO
+        ============================== */
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+
+            gap: 20px;
+
+            margin-bottom: 24px;
+        }
+
+        .hero h2 {
+            margin: 0;
+
+            font-size: 34px;
+
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            margin: 7px 0 0;
+
+            color: var(--muted);
+
             font-size: 14px;
         }
 
-        select {
-            background: rgba(255,255,255,0.9);
-            min-width: 180px;
+        /* ==============================
+           DATE
+        ============================== */
+
+        .date-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        button {
-            background: #2ecc71;
-            color: #000;
-            cursor: pointer;
-            font-weight: 700;
+        .date-navigation {
+            display: flex;
+            align-items: center;
+
+            background: var(--panel);
+
+            border:
+                1px solid var(--border);
+
+            padding: 6px;
+
+            border-radius: 14px;
         }
 
-        .toggle {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 11;
-            background: rgba(0,0,0,0.6);
+        .date-navigation button {
+            border: none;
+
+            background: transparent;
+
             color: white;
-            padding: 8px 12px;
-            border-radius: 10px;
+
+            width: 38px;
+            height: 38px;
+
+            border-radius: 9px;
+
             cursor: pointer;
+
+            font-size: 20px;
+        }
+
+        .date-navigation button:hover {
+            background:
+                rgba(255,255,255,0.07);
+        }
+
+        .date-display {
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .date-display strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .date-display span {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .calendar-button {
+            position: relative;
+
+            width: 46px;
+            height: 46px;
+
+            border-radius: 13px;
+
+            border:
+                1px solid var(--border);
+
+            background: var(--panel);
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            cursor: pointer;
+
+            font-size: 20px;
+
+            overflow: hidden;
+        }
+
+        .calendar-button:hover {
+            background: var(--panel2);
+            border-color:
+                rgba(53,229,138,0.35);
+        }
+
+        #calendarInput {
+            position: absolute;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            opacity: 0;
+
+            cursor: pointer;
+        }
+
+        /* ==============================
+           FORMAT TABS
+        ============================== */
+
+        .format-tabs {
+            display: flex;
+            gap: 10px;
+
+            overflow-x: auto;
+
+            margin-bottom: 24px;
+        }
+
+        .format-tab {
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 12px 18px;
+
+            border-radius: 13px;
+
+            border:
+                1px solid var(--border);
+
+            background: var(--panel);
+
+            color: #b5bdca;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            font-weight: 600;
+
             font-size: 13px;
         }
 
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                width: 90%;
-                bottom: 15px;
+        .format-tab:hover {
+            background: var(--panel2);
+            color: white;
+        }
+
+        .format-tab.active {
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--green),
+                    var(--green2)
+                );
+
+            border-color: transparent;
+
+            color: #041009;
+
+            box-shadow:
+                0 8px 25px
+                rgba(53,229,138,0.15);
+        }
+
+        .format-icon {
+            font-size: 17px;
+        }
+
+        /* ==============================
+           TOOLBAR
+        ============================== */
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .match-count {
+            color: var(--muted);
+
+            font-size: 12px;
+
+            background:
+                rgba(255,255,255,0.05);
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+        }
+
+        .search {
+            width: 240px;
+
+            padding: 11px 14px;
+
+            border-radius: 11px;
+
+            border:
+                1px solid var(--border);
+
+            background: var(--panel);
+
+            color: white;
+
+            outline: none;
+        }
+
+        .search::placeholder {
+            color: #68717f;
+        }
+
+        .search:focus {
+            border-color:
+                rgba(53,229,138,0.5);
+        }
+
+        /* ==============================
+           MATCH LIST
+        ============================== */
+
+        #matches {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .match-card {
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,0.045),
+                    rgba(255,255,255,0.018)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 16px;
+
+            padding: 16px 18px;
+
+            display: grid;
+
+            grid-template-columns:
+                100px
+                1fr
+                180px;
+
+            align-items: center;
+
+            gap: 20px;
+
+            transition:
+                transform 0.2s,
+                border-color 0.2s,
+                background 0.2s;
+        }
+
+        .match-card:hover {
+            transform: translateY(-2px);
+
+            border-color:
+                rgba(53,229,138,0.25);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,255,255,0.07),
+                    rgba(255,255,255,0.025)
+                );
+        }
+
+        /* ==============================
+           TIME
+        ============================== */
+
+        .match-time {
+            text-align: center;
+        }
+
+        .time {
+            font-size: 20px;
+            font-weight: 750;
+        }
+
+        .timezone {
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        /* ==============================
+           TEAMS
+        ============================== */
+
+        .teams {
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                35px
+                1fr;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .team {
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            min-width: 0;
+        }
+
+        .team.away {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .team-logo {
+            width: 42px;
+            height: 42px;
+
+            object-fit: contain;
+
+            flex-shrink: 0;
+
+            background:
+                rgba(255,255,255,0.04);
+
+            border-radius: 9px;
+
+            padding: 4px;
+        }
+
+        .team-name {
+            font-weight: 650;
+
+            font-size: 14px;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+        .score {
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        .versus {
+            color: #596271;
+
+            font-size: 11px;
+
+            text-align: center;
+        }
+
+        /* ==============================
+           SERIES
+        ============================== */
+
+        .series-name {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+        /* ==============================
+           STATUS
+        ============================== */
+
+        .status {
+            margin-bottom: 7px;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+        }
+
+        .status.live {
+            color: var(--red);
+        }
+
+        .status.upcoming {
+            color: var(--muted);
+        }
+
+        .status.finished {
+            color: #6f7785;
+        }
+
+        .live-dot {
+            display: inline-block;
+
+            width: 6px;
+            height: 6px;
+
+            background: var(--red);
+
+            border-radius: 50%;
+
+            margin-right: 5px;
+
+            animation:
+                pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0% {
+                opacity: 1;
+                transform: scale(1);
             }
 
-            select, button {
-                width: 100%;
+            50% {
+                opacity: 0.35;
+                transform: scale(0.75);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+        }
+
+        /* ==============================
+           WATCH
+        ============================== */
+
+        .watch-button {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border-radius: 11px;
+
+            border: none;
+
+            background: var(--green);
+
+            color: #031009;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .watch-button:hover {
+            background: #59f0a1;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 20px
+                rgba(53,229,138,0.18);
+        }
+
+        /* ==============================
+           EMPTY / LOADING
+        ============================== */
+
+        .empty {
+            text-align: center;
+
+            padding: 70px 20px;
+
+            background: var(--panel);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+            margin-bottom: 12px;
+        }
+
+        .empty h3 {
+            margin: 0 0 7px;
+            font-size: 19px;
+        }
+
+        .empty p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .loading {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            min-height: 220px;
+
+            color: var(--muted);
+        }
+
+        .spinner {
+            width: 19px;
+            height: 19px;
+
+            border:
+                2px solid rgba(255,255,255,0.12);
+
+            border-top-color:
+                var(--green);
+
+            border-radius: 50%;
+
+            animation:
+                spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
         }
+
+        /* ==============================
+           PLAYER
+        ============================== */
+
+        #player {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 500;
+
+            display: none;
+
+            background: #000;
+        }
+
+        #player.active {
+            display: block;
+        }
+
+        #player iframe {
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            border: none;
+        }
+
+        .close-player {
+            position: absolute;
+
+            top: 18px;
+            right: 18px;
+
+            z-index: 510;
+
+            width: 44px;
+            height: 44px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background:
+                rgba(0,0,0,0.75);
+
+            color: white;
+
+            font-size: 21px;
+
+            cursor: pointer;
+        }
+
+        /* ==============================
+           RESPONSIVE
+        ============================== */
+
+        @media (max-width: 850px) {
+
+            .hero {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .date-area {
+                align-self: flex-start;
+            }
+
+            .match-card {
+                grid-template-columns:
+                    75px
+                    1fr;
+            }
+
+            .match-action {
+                grid-column: 1 / -1;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            main {
+                padding:
+                    20px 13px 40px;
+            }
+
+            .header-inner {
+                padding:
+                    14px 15px;
+            }
+
+            .hero h2 {
+                font-size: 27px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search {
+                width: 100%;
+            }
+
+            .match-card {
+                grid-template-columns:
+                    65px
+                    1fr;
+
+                padding: 14px;
+            }
+
+            .team-name {
+                font-size: 13px;
+            }
+
+            .team-logo {
+                width: 34px;
+                height: 34px;
+            }
+
+            .time {
+                font-size: 17px;
+            }
+
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
-<div class="toggle" onclick="toggleControls()">
-    ⚙️ Controls
-</div>
 
-<div class="controls" id="controls">
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-    <select id="format">
-        <option value="">Select Format</option>
-        <option value="test-odi">Test</option>
-        <option value="test-odi">ODI</option>
-        <option value="t20">T20</option>
-    </select>
+<header>
 
-    <select id="team1"></select>
+    <div class="header-inner">
 
-    <select id="team2"></select>
+        <div class="brand">
 
-    <button onclick="loadMatch()">
-        ▶ Play Stream
+            <div class="brand-icon">
+                🏏
+            </div>
+
+            <div class="brand-text">
+
+                <h1>
+                    MatchDay
+                </h1>
+
+                <span>
+                    Cricket Schedule & Match Centre
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <button
+                class="icon-button"
+                onclick="goToday()">
+
+                📅 Today
+
+            </button>
+
+
+            <button
+                class="icon-button"
+                onclick="loadMatches()">
+
+                ↻ Refresh
+
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main>
+
+
+    <section class="hero">
+
+        <div>
+
+            <h2 id="pageTitle">
+                Today's Cricket
+            </h2>
+
+            <p id="pageSubtitle">
+                Fixtures and match information
+            </p>
+
+        </div>
+
+
+        <div class="date-area">
+
+
+            <div class="date-navigation">
+
+                <button
+                    onclick="changeDate(-1)">
+
+                    ‹
+
+                </button>
+
+
+                <div class="date-display">
+
+                    <strong id="dateText">
+                        Today
+                    </strong>
+
+                    <span id="fullDate">
+                        —
+                    </span>
+
+                </div>
+
+
+                <button
+                    onclick="changeDate(1)">
+
+                    ›
+
+                </button>
+
+            </div>
+
+
+            <label
+                class="calendar-button"
+                title="Choose date">
+
+                📅
+
+                <input
+                    type="date"
+                    id="calendarInput"
+                    onchange="calendarChanged(event)">
+
+            </label>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- FORMAT -->
+
+    <div class="format-tabs">
+
+        <button
+            class="format-tab active"
+            data-format="test"
+            onclick="selectFormat('test')">
+
+            <span class="format-icon">
+                🏏
+            </span>
+
+            Test
+
+        </button>
+
+
+        <button
+            class="format-tab"
+            data-format="odi"
+            onclick="selectFormat('odi')">
+
+            <span class="format-icon">
+                🏏
+            </span>
+
+            ODI
+
+        </button>
+
+
+        <button
+            class="format-tab"
+            data-format="t20"
+            onclick="selectFormat('t20')">
+
+            <span class="format-icon">
+                ⚡
+            </span>
+
+            T20
+
+        </button>
+
+    </div>
+
+
+
+    <!-- TOOLBAR -->
+
+    <div class="toolbar">
+
+        <div class="section-title">
+
+            <h3 id="competitionTitle">
+                Test Cricket
+            </h3>
+
+            <span
+                class="match-count"
+                id="matchCount">
+
+                0 matches
+
+            </span>
+
+        </div>
+
+
+        <input
+            class="search"
+            id="search"
+            type="text"
+            placeholder="Search teams..."
+            oninput="filterMatches()">
+
+    </div>
+
+
+
+    <!-- MATCHES -->
+
+    <div id="matches">
+
+        <div class="loading">
+
+            <div class="spinner"></div>
+
+            Loading cricket fixtures...
+
+        </div>
+
+    </div>
+
+</main>
+
+
+
+<!-- =====================================================
+     PLAYER
+===================================================== -->
+
+<div id="player">
+
+    <button
+        class="close-player"
+        onclick="closePlayer()">
+
+        ✕
+
     </button>
 
+
+    <iframe
+        id="matchFrame"
+        allowfullscreen
+        allow="autoplay; fullscreen"
+        scrolling="no"
+        frameborder="0"
+        allowtransparency
+        referrerpolicy="unsafe-url">
+    </iframe>
+
 </div>
 
-<iframe
-    id="matchFrame"
-    allowfullscreen
-    allowtransparency>
-</iframe>
+
 
 <script>
 
-const teams = [
-    "Afghanistan",
-    "Australia",
-    "Bangladesh",
-    "Canada",
-    "England",
-    "India",
-    "Ireland",
-    "Namibia",
-    "Nepal",
-    "Netherlands",
-    "New Zealand",
-    "Oman",
-    "Pakistan",
-    "Scotland",
-    "South Africa",
-    "Sri Lanka",
-    "United Arab Emirates",
-    "United States",
-    "West Indies",
-    "Zimbabwe"
-];
 
-const format = document.getElementById("format");
-const team1 = document.getElementById("team1");
-const team2 = document.getElementById("team2");
-const controls = document.getElementById("controls");
+/* =====================================================
+   STATE
+===================================================== */
+
+let currentFormat = "test";
+
+let selectedDate = new Date();
+
+let allMatches = [];
+
+let allSeries = [];
 
 
-function populate() {
+/* =====================================================
+   DOM
+===================================================== */
 
-    team1.innerHTML =
-        `<option value="">Home Team</option>`;
+const matchesContainer =
+    document.getElementById("matches");
 
-    team2.innerHTML =
-        `<option value="">Away Team</option>`;
+const searchInput =
+    document.getElementById("search");
 
-    teams.forEach(team => {
+const matchCount =
+    document.getElementById("matchCount");
 
-        team1.add(
-            new Option(team, team)
+const competitionTitle =
+    document.getElementById("competitionTitle");
+
+const pageTitle =
+    document.getElementById("pageTitle");
+
+const fullDate =
+    document.getElementById("fullDate");
+
+const dateText =
+    document.getElementById("dateText");
+
+const calendarInput =
+    document.getElementById("calendarInput");
+
+
+/* =====================================================
+   DATE
+===================================================== */
+
+function pad(number) {
+
+    return String(number)
+        .padStart(2, "0");
+
+}
+
+
+function getInputDateString(date) {
+
+    return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate())
+    );
+
+}
+
+
+function getDateString(date) {
+
+    return (
+        date.getFullYear() +
+        pad(date.getMonth() + 1) +
+        pad(date.getDate())
+    );
+
+}
+
+
+function isToday(date) {
+
+    const today = new Date();
+
+    return (
+        date.getFullYear() ===
+        today.getFullYear()
+
+        &&
+
+        date.getMonth() ===
+        today.getMonth()
+
+        &&
+
+        date.getDate() ===
+        today.getDate()
+    );
+
+}
+
+
+function updateDateUI() {
+
+    calendarInput.value =
+        getInputDateString(selectedDate);
+
+
+    fullDate.textContent =
+        selectedDate.toLocaleDateString(
+            "en-GB",
+            {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            }
         );
 
-        team2.add(
-            new Option(team, team)
+
+    if (isToday(selectedDate)) {
+
+        dateText.textContent =
+            "Today";
+
+        pageTitle.textContent =
+            "Today's Cricket";
+
+    }
+
+    else {
+
+        dateText.textContent =
+            selectedDate.toLocaleDateString(
+                "en-GB",
+                {
+                    weekday: "long"
+                }
+            );
+
+        pageTitle.textContent =
+            "Cricket Fixtures";
+
+    }
+
+}
+
+
+function changeDate(amount) {
+
+    selectedDate.setDate(
+        selectedDate.getDate() + amount
+    );
+
+    updateDateUI();
+
+    loadMatches();
+
+}
+
+
+function calendarChanged(event) {
+
+    if (!event.target.value) {
+        return;
+    }
+
+    const parts =
+        event.target.value.split("-");
+
+
+    selectedDate =
+        new Date(
+            Number(parts[0]),
+            Number(parts[1]) - 1,
+            Number(parts[2])
         );
 
-    });
+
+    updateDateUI();
+
+    loadMatches();
+
 }
 
 
-function formatTeam(team) {
+function goToday() {
 
-    return team
-        .toLowerCase()
-        .replace(/&/g, "and")
-        .replace(/\s+/g, "-");
+    selectedDate =
+        new Date();
+
+    updateDateUI();
+
+    loadMatches();
+
 }
 
 
-function loadMatch() {
+/* =====================================================
+   FORMAT
+===================================================== */
 
-    if (!format.value) {
-        alert("Please select a match format");
-        return;
+function selectFormat(format) {
+
+    currentFormat = format;
+
+
+    document
+        .querySelectorAll(".format-tab")
+        .forEach(tab => {
+
+            tab.classList.toggle(
+                "active",
+                tab.dataset.format === format
+            );
+
+        });
+
+
+    const names = {
+        test: "Test Cricket",
+        odi: "ODI Cricket",
+        t20: "T20 Cricket"
+    };
+
+
+    competitionTitle.textContent =
+        names[format];
+
+
+    searchInput.value = "";
+
+    loadMatches();
+
+}
+
+
+/* =====================================================
+   LOAD CRICKET SERIES
+===================================================== */
+
+async function loadMatches() {
+
+    matchesContainer.innerHTML = `
+
+        <div class="loading">
+
+            <div class="spinner"></div>
+
+            Loading cricket fixtures...
+
+        </div>
+
+    `;
+
+
+    try {
+
+        /*
+         * IMPORTANT:
+         *
+         * Cricket does NOT use the normal ESPN
+         * site scoreboard endpoint.
+         *
+         * We first get active cricket series from
+         * the personalized cricket header.
+         */
+
+        const url =
+            "https://site.api.espn.com/apis/" +
+            "personalized/v2/scoreboard/header" +
+            "?sport=cricket" +
+            "&region=uk" +
+            "&tz=Europe/London";
+
+
+        const response =
+            await fetch(url);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "ESPN returned HTTP " +
+                response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        /*
+         * ESPN returns:
+
+         * sports[]
+         *   leagues[]
+         *      events[]
+         */
+
+        const sports =
+            data.sports || [];
+
+
+        allSeries = [];
+
+        let events = [];
+
+
+        sports.forEach(
+            sport => {
+
+                const leagues =
+                    sport.leagues || [];
+
+
+                leagues.forEach(
+                    league => {
+
+                        allSeries.push(
+                            league
+                        );
+
+
+                        const leagueEvents =
+                            league.events || [];
+
+
+                        leagueEvents.forEach(
+                            event => {
+
+                                events.push({
+
+                                    ...event,
+
+                                    seriesId:
+                                        league.id,
+
+                                    seriesName:
+                                        league.name,
+
+                                    seriesSlug:
+                                        league.slug,
+
+                                    seriesAbbreviation:
+                                        league.abbreviation
+
+                                });
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        /*
+         * Filter by selected date.
+         */
+
+        const targetDate =
+            getInputDateString(
+                selectedDate
+            );
+
+
+        events =
+            events.filter(
+                event => {
+
+                    if (!event.date) {
+                        return false;
+                    }
+
+
+                    const eventDate =
+                        new Date(event.date);
+
+
+                    return (
+                        getInputDateString(
+                            eventDate
+                        ) === targetDate
+                    );
+
+                }
+            );
+
+
+        /*
+         * Filter Test / ODI / T20.
+         */
+
+        events =
+            events.filter(
+                event =>
+                    isCorrectFormat(
+                        event,
+                        currentFormat
+                    )
+            );
+
+
+        /*
+         * Remove duplicate event IDs.
+         */
+
+        const unique =
+            new Map();
+
+
+        events.forEach(
+            event => {
+
+                if (event.id) {
+
+                    unique.set(
+                        String(event.id),
+                        event
+                    );
+
+                }
+
+            }
+        );
+
+
+        allMatches =
+            Array.from(
+                unique.values()
+            );
+
+
+        renderMatches(allMatches);
+
     }
 
-    if (!team1.value || !team2.value) {
-        alert("Please select both teams");
-        return;
+
+    catch (error) {
+
+        console.error(
+            "Cricket API error:",
+            error
+        );
+
+
+        matchesContainer.innerHTML = `
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    ⚠️
+                </div>
+
+                <h3>
+                    Couldn't load fixtures
+                </h3>
+
+                <p>
+                    Cricket fixture data could not
+                    be loaded right now.
+                </p>
+
+            </div>
+
+        `;
+
+
+        matchCount.textContent =
+            "Unavailable";
+
     }
 
-    if (team1.value === team2.value) {
-        alert("Teams must be different");
-        return;
-    }
-
-    const streamUrl =
-        `https://embedsports.me/${format.value}/` +
-        `${formatTeam(team1.value)}-vs-${formatTeam(team2.value)}-stream-1`;
-
-    document.getElementById("matchFrame").src = streamUrl;
-
-    controls.style.display = "none";
 }
 
 
-function toggleControls() {
+/* =====================================================
+   FORMAT DETECTION
+===================================================== */
 
-    controls.style.display =
-        controls.style.display === "none"
-            ? "flex"
-            : "none";
+function isCorrectFormat(
+    event,
+    format
+) {
+
+    const text = [
+
+        event.name,
+
+        event.shortName,
+
+        event.description,
+
+        event.seriesName,
+
+        event.seriesSlug,
+
+        event.seriesAbbreviation
+
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+
+    /*
+     * TEST
+     */
+
+    if (format === "test") {
+
+        return (
+            text.includes("test")
+        );
+
+    }
+
+
+    /*
+     * ODI
+     */
+
+    if (format === "odi") {
+
+        return (
+            text.includes("odi") ||
+            text.includes("one-day") ||
+            text.includes("one day") ||
+            text.includes("50 over")
+        );
+
+    }
+
+
+    /*
+     * T20
+     */
+
+    if (format === "t20") {
+
+        return (
+            text.includes("t20") ||
+            text.includes("t-20") ||
+            text.includes("twenty20") ||
+            text.includes("twenty20")
+        );
+
+    }
+
+
+    return false;
+
 }
 
 
-populate();
+/* =====================================================
+   RENDER
+===================================================== */
+
+function renderMatches(matches) {
+
+    if (!matches.length) {
+
+        matchesContainer.innerHTML = `
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    🏏
+                </div>
+
+                <h3>
+                    No matches scheduled
+                </h3>
+
+                <p>
+                    No ${getFormatName()}
+                    fixtures were found for this date.
+                </p>
+
+            </div>
+
+        `;
+
+
+        matchCount.textContent =
+            "0 matches";
+
+
+        return;
+
+    }
+
+
+    matches =
+        [...matches].sort(
+            (a, b) =>
+                new Date(a.date) -
+                new Date(b.date)
+        );
+
+
+    matchCount.textContent =
+        `${matches.length} ${
+            matches.length === 1
+                ? "match"
+                : "matches"
+        }`;
+
+
+    matchesContainer.innerHTML =
+        matches
+            .map(createMatchCard)
+            .join("");
+
+}
+
+
+function getFormatName() {
+
+    const names = {
+
+        test: "Test Cricket",
+
+        odi: "ODI Cricket",
+
+        t20: "T20 Cricket"
+
+    };
+
+
+    return names[currentFormat];
+
+}
+
+
+/* =====================================================
+   MATCH CARD
+===================================================== */
+
+function createMatchCard(event) {
+
+    /*
+     * Personalized header events generally contain
+     * competitors directly.
+     */
+
+    const competition =
+        event.competitions?.[0] ||
+        event.competition ||
+        null;
+
+
+    let competitors =
+        competition?.competitors ||
+        event.competitors ||
+        [];
+
+
+    /*
+     * Some ESPN responses can place teams inside
+     * a competitors object.
+     */
+
+    if (
+        !Array.isArray(competitors)
+    ) {
+
+        competitors =
+            Object.values(
+                competitors
+            );
+
+    }
+
+
+    let teamA =
+        competitors.find(
+            team =>
+                team.homeAway === "home"
+        );
+
+
+    let teamB =
+        competitors.find(
+            team =>
+                team.homeAway === "away"
+        );
+
+
+    if (!teamA || !teamB) {
+
+        teamA =
+            competitors[0];
+
+        teamB =
+            competitors[1];
+
+    }
+
+
+    /*
+     * If the header doesn't contain competitors,
+     * try parsing the event name.
+     */
+
+    let homeName =
+        getTeamName(teamA);
+
+
+    let awayName =
+        getTeamName(teamB);
+
+
+    if (
+        !homeName ||
+        !awayName
+    ) {
+
+        const parsed =
+            parseTeamsFromEvent(
+                event
+            );
+
+
+        homeName =
+            parsed.home;
+
+        awayName =
+            parsed.away;
+
+    }
+
+
+    if (
+        !homeName ||
+        !awayName
+    ) {
+
+        homeName =
+            event.shortName ||
+            event.name ||
+            "Team 1";
+
+
+        awayName =
+            "";
+
+    }
+
+
+    const homeLogo =
+        getTeamLogo(teamA);
+
+
+    const awayLogo =
+        getTeamLogo(teamB);
+
+
+    const state =
+        event.status?.type?.state ||
+        event.status?.state ||
+        "pre";
+
+
+    const detail =
+        event.status?.type?.detail ||
+        event.status?.detail ||
+        "Upcoming";
+
+
+    const isLive =
+        state === "in" ||
+        state === "live";
+
+
+    const isFinished =
+        state === "post" ||
+        state === "final";
+
+
+    let statusHTML;
+
+
+    if (isLive) {
+
+        statusHTML = `
+
+            <div class="status live">
+
+                <span class="live-dot"></span>
+
+                LIVE
+
+            </div>
+
+        `;
+
+    }
+
+    else if (isFinished) {
+
+        statusHTML = `
+
+            <div class="status finished">
+
+                FINISHED
+
+            </div>
+
+        `;
+
+    }
+
+    else {
+
+        statusHTML = `
+
+            <div class="status upcoming">
+
+                ${escapeHTML(detail)}
+
+            </div>
+
+        `;
+
+    }
+
+
+    const homeScore =
+        getScore(teamA);
+
+
+    const awayScore =
+        getScore(teamB);
+
+
+    const scoreHome =
+        homeScore !== ""
+            ? `
+                <div class="score">
+                    ${escapeHTML(homeScore)}
+                </div>
+              `
+            : "";
+
+
+    const scoreAway =
+        awayScore !== ""
+            ? `
+                <div class="score">
+                    ${escapeHTML(awayScore)}
+                </div>
+              `
+            : "";
+
+
+    const series =
+        event.seriesName ||
+        "";
+
+
+    return `
+
+        <article class="match-card">
+
+
+            <div class="match-time">
+
+                <div class="time">
+
+                    ${formatUKTime(event.date)}
+
+                </div>
+
+                <div class="timezone">
+                    UK TIME
+                </div>
+
+            </div>
+
+
+
+            <div class="teams">
+
+
+                <div class="team">
+
+
+                    ${
+                        homeLogo
+                            ? `
+                                <img
+                                    class="team-logo"
+                                    src="${escapeAttribute(homeLogo)}"
+                                    alt=""
+                                >
+                              `
+                            : ""
+                    }
+
+
+                    <div>
+
+                        <div class="team-name">
+
+                            ${escapeHTML(homeName)}
+
+                        </div>
+
+                        ${scoreHome}
+
+
+                        ${
+                            series
+                                ? `
+                                    <div
+                                        class="series-name">
+
+                                        ${escapeHTML(series)}
+
+                                    </div>
+                                  `
+                                : ""
+                        }
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="versus">
+                    VS
+                </div>
+
+
+
+                <div class="team away">
+
+
+                    <div>
+
+                        <div class="team-name">
+
+                            ${escapeHTML(awayName)}
+
+                        </div>
+
+                        ${scoreAway}
+
+                    </div>
+
+
+                    ${
+                        awayLogo
+                            ? `
+                                <img
+                                    class="team-logo"
+                                    src="${escapeAttribute(awayLogo)}"
+                                    alt=""
+                                >
+                              `
+                            : ""
+                    }
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="match-action">
+
+                ${statusHTML}
+
+
+                <button
+                    class="watch-button"
+                    onclick='watchMatch(
+                        ${JSON.stringify(homeName)},
+                        ${JSON.stringify(awayName)},
+                        ${JSON.stringify(currentFormat)}
+                    )'>
+
+                    ▶ WATCH NOW
+
+                </button>
+
+            </div>
+
+
+        </article>
+
+    `;
+
+}
+
+
+/* =====================================================
+   TEAM NAME
+===================================================== */
+
+function getTeamName(team) {
+
+    if (!team) {
+        return "";
+    }
+
+
+    return (
+        team.team?.displayName ||
+        team.team?.name ||
+        team.team?.shortDisplayName ||
+        team.team?.abbreviation ||
+        team.displayName ||
+        team.name ||
+        team.shortDisplayName ||
+        team.abbreviation ||
+        ""
+    );
+
+}
+
+
+/* =====================================================
+   TEAM LOGO
+===================================================== */
+
+function getTeamLogo(team) {
+
+    if (!team) {
+        return "";
+    }
+
+
+    return (
+        team.team?.logo ||
+        team.logo ||
+        ""
+    );
+
+}
+
+
+/* =====================================================
+   SCORE
+===================================================== */
+
+function getScore(team) {
+
+    if (!team) {
+        return "";
+    }
+
+
+    return (
+        team.score ??
+        team.team?.score ??
+        ""
+    );
+
+}
+
+
+/* =====================================================
+   FALLBACK TEAM PARSER
+===================================================== */
+
+function parseTeamsFromEvent(event) {
+
+    const name =
+        event.name ||
+        event.shortName ||
+        "";
+
+
+    const separators = [
+        " vs ",
+        " v ",
+        " - ",
+        " vs. "
+    ];
+
+
+    for (
+        const separator of separators
+    ) {
+
+        if (
+            name
+                .toLowerCase()
+                .includes(
+                    separator.trim()
+                        .toLowerCase()
+                )
+        ) {
+
+            const parts =
+                name.split(
+                    new RegExp(
+                        separator,
+                        "i"
+                    )
+                );
+
+
+            if (parts.length >= 2) {
+
+                return {
+
+                    home:
+                        parts[0].trim(),
+
+                    away:
+                        parts
+                            .slice(1)
+                            .join(
+                                separator
+                            )
+                            .trim()
+
+                };
+
+            }
+
+        }
+
+    }
+
+
+    return {
+
+        home: "",
+
+        away: ""
+
+    };
+
+}
+
+
+/* =====================================================
+   WATCH MATCH
+===================================================== */
+
+function watchMatch(
+    homeTeam,
+    awayTeam,
+    format
+) {
+
+    if (
+        !homeTeam ||
+        !awayTeam
+    ) {
+
+        alert(
+            "The team names for this match " +
+            "could not be identified."
+        );
+
+        return;
+
+    }
+
+
+    const url =
+        getCricketStreamUrl(
+            format,
+            homeTeam,
+            awayTeam
+        );
+
+
+    if (!url) {
+
+        alert(
+            "No stream is configured for " +
+            "this match."
+        );
+
+        return;
+
+    }
+
+
+    console.log(
+        "Opening cricket stream:",
+        url
+    );
+
+
+    document
+        .getElementById("matchFrame")
+        .src = url;
+
+
+    document
+        .getElementById("player")
+        .classList.add("active");
+
+}
+
+
+/* =====================================================
+   STREAM URL
+===================================================== */
+
+function getCricketStreamUrl(
+    format,
+    homeTeam,
+    awayTeam
+) {
+
+    /*
+     * YOUR URL RULES:
+     *
+     * Test -> test-odi
+     * ODI  -> test-odi
+     * T20  -> t20
+     */
+
+    const formatPath = {
+
+        test:
+            "test-odi",
+
+        odi:
+            "test-odi",
+
+        t20:
+            "t20"
+
+    };
+
+
+    const path =
+        formatPath[format];
+
+
+    if (!path) {
+        return null;
+    }
+
+
+    function formatTeam(team) {
+
+        return String(team)
+
+            .toLowerCase()
+
+            .replace(
+                /&/g,
+                "and"
+            )
+
+            .replace(
+                /'/g,
+                ""
+            )
+
+            .replace(
+                /[^a-z0-9\s-]/g,
+                ""
+            )
+
+            .replace(
+                /\s+/g,
+                "-"
+            )
+
+            .replace(
+                /-+/g,
+                "-"
+            )
+
+            .replace(
+                /^-|-$/g,
+                ""
+            );
+
+    }
+
+
+    const home =
+        formatTeam(homeTeam);
+
+
+    const away =
+        formatTeam(awayTeam);
+
+
+    return (
+        "https://embedsports.me/" +
+        path +
+        "/" +
+        home +
+        "-vs-" +
+        away +
+        "-stream-1"
+    );
+
+}
+
+
+/* =====================================================
+   CLOSE PLAYER
+===================================================== */
+
+function closePlayer() {
+
+    document
+        .getElementById("matchFrame")
+        .src = "";
+
+
+    document
+        .getElementById("player")
+        .classList.remove("active");
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+function filterMatches() {
+
+    const query =
+        searchInput.value
+            .toLowerCase()
+            .trim();
+
+
+    if (!query) {
+
+        renderMatches(
+            allMatches
+        );
+
+        return;
+
+    }
+
+
+    const filtered =
+        allMatches.filter(
+            event => {
+
+                const text = [
+
+                    event.name,
+
+                    event.shortName,
+
+                    event.seriesName
+
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+
+                return text.includes(
+                    query
+                );
+
+            }
+        );
+
+
+    renderMatches(
+        filtered
+    );
+
+}
+
+
+/* =====================================================
+   UK TIME
+===================================================== */
+
+function formatUKTime(
+    dateString
+) {
+
+    if (!dateString) {
+        return "--:--";
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "en-GB",
+        {
+
+            timeZone:
+                "Europe/London",
+
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit",
+
+            hour12:
+                false
+
+        }
+    ).format(
+        new Date(dateString)
+    );
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    )
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   ESCAPE ATTRIBUTE
+===================================================== */
+
+function escapeAttribute(value) {
+
+    return String(
+        value ?? ""
+    )
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        );
+
+}
+
+
+/* =====================================================
+   AUTO REFRESH
+===================================================== */
+
+setInterval(
+    loadMatches,
+    60000
+);
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+updateDateUI();
+
+loadMatches();
+
 
 </script>
 
 </body>
+
 </html>
