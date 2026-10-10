@@ -1080,6 +1080,19 @@
 
         </button>
 
+        <button
+            class="format-tab"
+            data-format="cricket"
+            onclick="selectFormat('cricket')">
+
+            <span class="format-icon">
+                🏏
+            </span>
+
+            Cricket
+
+        </button>
+
     </div>
 
 
@@ -1386,7 +1399,8 @@ function selectFormat(format) {
     const names = {
         test: "Test Cricket",
         odi: "ODI Cricket",
-        t20: "T20 Cricket"
+        t20: "T20 Cricket",
+        cricket: "Cricket"
     };
 
 
@@ -1526,50 +1540,44 @@ async function loadMatches() {
 
 
         /*
-         * Filter by selected date.
+         * Filter Test / ODI / T20 first.
          */
-
-        const targetDate =
-            getInputDateString(
-                selectedDate
-            );
-
-
-        events =
-            events.filter(
-                event => {
-
-                    if (!event.date) {
-                        return false;
-                    }
-
-
-                    const eventDate =
-                        new Date(event.date);
-
-
-                    return (
-                        getInputDateString(
-                            eventDate
-                        ) === targetDate
-                    );
-
-                }
-            );
-
+        events = events.filter(event =>
+            isCorrectFormat(event, currentFormat)
+        );
 
         /*
-         * Filter Test / ODI / T20.
+         * Test matches run for several days. ESPN commonly provides
+         * only the start date, so include a Test that started today
+         * or during the previous four days. ODI/T20 remain date-specific.
          */
+        const targetDate = getInputDateString(selectedDate);
+        const selectedDay = new Date(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate()
+        );
 
-        events =
-            events.filter(
-                event =>
-                    isCorrectFormat(
-                        event,
-                        currentFormat
-                    )
-            );
+        events = events.filter(event => {
+            if (!event.date) return false;
+
+            const eventDate = new Date(event.date);
+            if (isNaN(eventDate.getTime())) return false;
+
+            if (currentFormat === "test") {
+                const startDay = new Date(
+                    eventDate.getFullYear(),
+                    eventDate.getMonth(),
+                    eventDate.getDate()
+                );
+                const daysSinceStart = Math.floor(
+                    (selectedDay - startDay) / 86400000
+                );
+                return daysSinceStart >= 0 && daysSinceStart <= 4;
+            }
+
+            return getInputDateString(eventDate) === targetDate;
+        });
 
 
         /*
@@ -1666,7 +1674,11 @@ function isCorrectFormat(
 
         event.seriesSlug,
 
-        event.seriesAbbreviation
+        event.seriesAbbreviation,
+        event.format,
+        event.type?.text,
+        event.competitions?.[0]?.type?.text,
+        event.competitions?.[0]?.notes?.map(note => note.headline).join(" ")
 
     ]
         .filter(Boolean)
@@ -1713,11 +1725,15 @@ function isCorrectFormat(
             text.includes("t20") ||
             text.includes("t-20") ||
             text.includes("twenty20") ||
-            text.includes("twenty20")
+            text.includes("twenty-20")
         );
 
     }
 
+    // Manual Cricket tab: show all cricket formats together.
+    if (format === "cricket") {
+        return true;
+    }
 
     return false;
 
@@ -1795,7 +1811,9 @@ function getFormatName() {
 
         odi: "ODI Cricket",
 
-        t20: "T20 Cricket"
+        t20: "T20 Cricket",
+
+        cricket: "Cricket"
 
     };
 
@@ -2391,6 +2409,7 @@ function getCricketStreamUrl(
      * Test -> test-odi
      * ODI  -> test-odi
      * T20  -> t20
+     * Cricket (manual tab) -> cricket
      */
 
     const formatPath = {
@@ -2402,7 +2421,10 @@ function getCricketStreamUrl(
             "test-odi",
 
         t20:
-            "t20"
+            "t20",
+
+        cricket:
+            "cricket"
 
     };
 
